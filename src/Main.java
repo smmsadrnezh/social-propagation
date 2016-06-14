@@ -1,6 +1,4 @@
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
@@ -9,11 +7,17 @@ import java.util.Scanner;
 public class Main {
 
     public static void main(String[] args) throws IOException {
-        String nodesFile = "/home/smmsadrnezh/IdeaProjects/social-propagation/src/Nodes.txt";
-        String edgesFile = "/home/smmsadrnezh/IdeaProjects/social-propagation/src/Edges.txt";
-        String seedsFile = "/home/smmsadrnezh/IdeaProjects/social-propagation/src/Seed.txt";
+
+        // Build Graph From Files
+        String path = "/home/smmsadrnezh/IdeaProjects/social-propagation/src/";
+        String nodesFile = path + "Nodes.txt";
+        String edgesFile = path + "Edges.txt";
+        String seedsFile = path + "Seed.txt";
+        String outputFile = path + "Out.txt";
         Graph graph = new Graph(nodesFile, edgesFile, seedsFile);
-        graph.run();
+
+        // Run The Process
+        graph.run(outputFile);
     }
 }
 
@@ -74,10 +78,32 @@ class Graph {
         }
     }
 
-    void run(){
+    void run(String outputFile) throws FileNotFoundException {
 
         // Scan number of turns
         Integer turns = new Scanner(System.in).nextInt();
+
+        // Open Output File
+        PrintWriter writer = new PrintWriter(outputFile);
+
+        // Write Header
+        writer.println("Trun All Type1 Type2 Type3 Type4 " + Nodesclass.keySet().toString());
+
+        // Write Seed Values
+        Integer all = 0, type1 = 0, type2 = 0, type3 = 0, type4 = 0;
+        HashMap<String, Integer> NodesClassCount = new HashMap();
+        Object[] classes = Nodesclass.keySet().toArray();
+        for (int i = 0; i < classes.length; i++) {
+            System.out.println(classes);
+        }
+
+        // Compute Output in Each Turn
+        for (int i = 0; i < turns; i++) {
+
+            writer.println(i + " " + all + " " + type1 + " " + type2 + " " + type3 + " " + type4);
+        }
+
+        writer.close();
 
     }
 }
@@ -87,6 +113,7 @@ class Node {
     String nodeClass;
     Double[] rate = new Double[3];
     Integer newsType = 0;
+    HashMap<Integer, Boolean> visitedTypes = new HashMap();
 
     public Node(Integer nodeIndex, String nodeClass, Double[] rate) {
         this.nodeIndex = nodeIndex;
