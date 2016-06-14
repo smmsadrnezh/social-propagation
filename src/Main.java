@@ -23,8 +23,11 @@ public class Main {
 
 class Graph {
     public static ArrayList<Node> nodesArray = new ArrayList();
+    public static ArrayList<Node> nodesWithNewsArray = new ArrayList();
     public static ArrayList<Edge> edgesArray = new ArrayList();
     public static HashMap<String, ArrayList<Node>> Nodesclass = new HashMap();
+    public static Integer all = 0;
+    public static Integer[] typeCount = new Integer[3];
 
     public Graph(String nodesFile, String edgesFile, String seedsFile) throws IOException {
 
@@ -71,6 +74,7 @@ class Graph {
                 for (int i = 1; i < splitLine.length; i++) {
                     if (node.nodeIndex == Integer.parseInt(splitLine[i])) {
                         node.newsType = type;
+                        nodesWithNewsArray.add(node);
                     }
                 }
             }
@@ -86,21 +90,47 @@ class Graph {
         // Open Output File
         PrintWriter writer = new PrintWriter(outputFile);
 
-        // Write Header
-        writer.println("Trun All Type1 Type2 Type3 Type4 " + Nodesclass.keySet().toString());
-
-        // Write Seed Values
-        Integer all = 0, type1 = 0, type2 = 0, type3 = 0, type4 = 0;
+        // Set Seed Values
+        all = nodesWithNewsArray.size();
+        String classes = "";
         HashMap<String, Integer> NodesClassCount = new HashMap();
-        Object[] classes = Nodesclass.keySet().toArray();
-        for (int i = 0; i < classes.length; i++) {
-            System.out.println(classes);
+        for (String e : Nodesclass.keySet()) {
+            classes += " " + e;
+            NodesClassCount.put(e, Nodesclass.get(e).size());
         }
+        for (int i = 0; i < typeCount.length; i++) {
+            typeCount[i] = 0;
+        }
+        for (Node node : nodesWithNewsArray) {
+            if (node.newsType != 0)
+                typeCount[node.newsType - 1]++;
+        }
+
+        // Write Header
+        writer.println("Trun All Type1 Type2 Type3 Type4" + classes);
 
         // Compute Output in Each Turn
         for (int i = 0; i < turns; i++) {
 
-            writer.println(i + " " + all + " " + type1 + " " + type2 + " " + type3 + " " + type4);
+            // Find Seed Nodes and Set newsTypes
+//            for (Node node : nodesArray) {
+//                for (int i = 1; i < splitLine.length; i++) {
+//                    if (node.nodeIndex == Integer.parseInt(splitLine[i])) {
+//                        node.newsType = type;
+//                    }
+//                }
+//            }
+
+            // make and print line
+            String nodeClassCountValues = "";
+            String typeCountValues = "";
+            for (Integer e : NodesClassCount.values()) {
+                nodeClassCountValues += " " + e;
+            }
+            for (Integer e : typeCount) {
+                typeCountValues += " " + e;
+            }
+            writer.println(i + " " + all + typeCountValues + nodeClassCountValues);
         }
 
         writer.close();
