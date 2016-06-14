@@ -107,19 +107,39 @@ class Graph {
         }
 
         // Write Header
-        writer.println("Trun All Type1 Type2 Type3 Type4" + classes);
+        writer.println("Turn All Type1 Type2 Type3 Type4" + classes);
 
         // Compute Output in Each Turn
         for (int i = 0; i < turns; i++) {
 
-            // Find Seed Nodes and Set newsTypes
-//            for (Node node : nodesArray) {
-//                for (int i = 1; i < splitLine.length; i++) {
-//                    if (node.nodeIndex == Integer.parseInt(splitLine[i])) {
-//                        node.newsType = type;
-//                    }
-//                }
-//            }
+            // Find Nodes Connected to nodesWithNewsArray
+            for (Node node : nodesWithNewsArray) {
+                for (Edge edge : edgesArray) {
+                    if (edge.destNode == node.nodeIndex) {
+                        for (Node srcNode : nodesArray) {
+                            if (edge.srcNode == srcNode.nodeIndex) {
+                                // Check The Probability to see the news
+                                if(Math.random() < edge.weight){
+                                    // Check If It's not visited before
+                                    if(!srcNode.visitedTypes.get(node.newsType-1)){
+                                        // Check The Probability to share the news
+                                        if(Math.random() < node.rate[node.newsType]){
+                                            nodesWithNewsArray.add(srcNode);
+                                            srcNode.newsType = node.newsType;
+                                            // +1 all related counters
+                                            all++;
+                                            typeCount[node.newsType-1]++;
+                                            NodesClassCount.put(node.nodeClass, NodesClassCount.get(node.nodeClass) + 1);
+                                        } else {
+                                            srcNode.visitedTypes.put(node.newsType,Boolean.TRUE);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
 
             // make and print line
             String nodeClassCountValues = "";
@@ -149,6 +169,9 @@ class Node {
         this.nodeIndex = nodeIndex;
         this.nodeClass = nodeClass;
         this.rate = rate;
+        for (int i = 0; i < 3; i++) {
+            visitedTypes.put(i,Boolean.FALSE);
+        }
     }
 
 }
