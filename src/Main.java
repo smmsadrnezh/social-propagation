@@ -112,6 +112,7 @@ class Graph {
         // Compute Output in Each Turn
         for (int i = 0; i < turns; i++) {
 
+            ArrayList<Node> newNodesWithNewsArray = new ArrayList();
             // Find Nodes Connected to nodesWithNewsArray
             for (Node node : nodesWithNewsArray) {
                 for (Edge edge : edgesArray) {
@@ -124,7 +125,7 @@ class Graph {
                                     if(!srcNode.visitedTypes.get(node.newsType-1)){
                                         // Check The Probability to share the news
                                         if(Math.random() < node.rate[node.newsType]){
-                                            nodesWithNewsArray.add(srcNode);
+                                            newNodesWithNewsArray.add(srcNode);
                                             srcNode.newsType = node.newsType;
                                             // +1 all related counters
                                             all++;
@@ -140,6 +141,8 @@ class Graph {
                     }
                 }
             }
+
+            nodesWithNewsArray.addAll(newNodesWithNewsArray);
 
             // make and print line
             String nodeClassCountValues = "";
