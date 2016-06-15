@@ -27,7 +27,7 @@ class Graph {
     public static ArrayList<Edge> edgesArray = new ArrayList();
     public static HashMap<String, ArrayList<Node>> Nodesclass = new HashMap();
     public static Integer all = 0;
-    public static Integer[] typeCount = new Integer[3];
+    public static Integer[] typeCount = new Integer[4];
 
     public Graph(String nodesFile, String edgesFile, String seedsFile) throws IOException {
 
@@ -96,7 +96,7 @@ class Graph {
         HashMap<String, Integer> NodesClassCount = new HashMap();
         for (String e : Nodesclass.keySet()) {
             classes += " " + e;
-            NodesClassCount.put(e, Nodesclass.get(e).size());
+            NodesClassCount.put(e, 0);
         }
         for (int i = 0; i < typeCount.length; i++) {
             typeCount[i] = 0;
@@ -114,25 +114,27 @@ class Graph {
 
             ArrayList<Node> newNodesWithNewsArray = new ArrayList();
             // Find Nodes Connected to nodesWithNewsArray
-            for (Node node : nodesWithNewsArray) {
-                for (Edge edge : edgesArray) {
-                    if (edge.destNode == node.nodeIndex) {
-                        for (Node srcNode : nodesArray) {
-                            if (edge.srcNode == srcNode.nodeIndex) {
-                                // Check The Probability to see the news
-                                if(Math.random() < edge.weight){
-                                    // Check If It's not visited before
-                                    if(!srcNode.visitedTypes.get(node.newsType-1)){
-                                        // Check The Probability to share the news
-                                        if(Math.random() < node.rate[node.newsType]){
-                                            newNodesWithNewsArray.add(srcNode);
-                                            srcNode.newsType = node.newsType;
-                                            // +1 all related counters
-                                            all++;
-                                            typeCount[node.newsType-1]++;
-                                            NodesClassCount.put(node.nodeClass, NodesClassCount.get(node.nodeClass) + 1);
-                                        } else {
-                                            srcNode.visitedTypes.put(node.newsType,Boolean.TRUE);
+            if (nodesWithNewsArray.size() != nodesArray.size())
+                for (Node node : nodesWithNewsArray) {
+                    for (Edge edge : edgesArray) {
+                        if (edge.destNode == node.nodeIndex) {
+                            for (Node srcNode : nodesArray) {
+                                if (edge.srcNode == srcNode.nodeIndex) {
+                                    // Check The Probability to see the news
+                                    if (Math.random() < edge.weight) {
+                                        // Check If It's not visited before
+                                        if (!srcNode.visitedTypes.get(node.newsType - 1)) {
+                                            // Check The Probability to share the news
+                                            if (Math.random() < node.rate[node.newsType - 1]) {
+                                                newNodesWithNewsArray.add(srcNode);
+                                                srcNode.newsType = node.newsType;
+                                                // +1 all related counters
+                                                all++;
+                                                typeCount[node.newsType - 1]++;
+                                                NodesClassCount.put(node.nodeClass, NodesClassCount.get(node.nodeClass) + 1);
+                                            } else {
+                                                srcNode.visitedTypes.put(node.newsType, Boolean.TRUE);
+                                            }
                                         }
                                     }
                                 }
@@ -140,7 +142,6 @@ class Graph {
                         }
                     }
                 }
-            }
 
             nodesWithNewsArray.addAll(newNodesWithNewsArray);
 
@@ -172,8 +173,8 @@ class Node {
         this.nodeIndex = nodeIndex;
         this.nodeClass = nodeClass;
         this.rate = rate;
-        for (int i = 0; i < 3; i++) {
-            visitedTypes.put(i,Boolean.FALSE);
+        for (int i = 0; i < 4; i++) {
+            visitedTypes.put(i, Boolean.FALSE);
         }
     }
 
