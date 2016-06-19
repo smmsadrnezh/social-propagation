@@ -1,5 +1,6 @@
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Scanner;
 
@@ -111,6 +112,7 @@ class Graph {
 
         // Compute Output in Each Turn
         for (int i = 0; i < turns; i++) {
+            Node srcNode;
 
             ArrayList<Node> newNodesWithNewsArray = new ArrayList();
             // Find Nodes Connected to nodesWithNewsArray
@@ -118,24 +120,21 @@ class Graph {
                 for (Node node : nodesWithNewsArray) {
                     for (Edge edge : edgesArray) {
                         if (edge.destNode == node.nodeIndex) {
-                            for (Node srcNode : nodesArray) {
-                                if (edge.srcNode == srcNode.nodeIndex) {
-                                    // Check The Probability to see the news
-                                    if (Math.random() < edge.weight) {
-                                        // Check If It's not visited before
-                                        if (!srcNode.visitedTypes.get(node.newsType - 1)) {
-                                            // Check The Probability to share the news
-                                            if (Math.random() < node.rate[node.newsType - 1]) {
-                                                newNodesWithNewsArray.add(srcNode);
-                                                srcNode.newsType = node.newsType;
-                                                // +1 all related counters
-                                                all++;
-                                                typeCount[node.newsType - 1]++;
-                                                NodesClassCount.put(node.nodeClass, NodesClassCount.get(node.nodeClass) + 1);
-                                            } else {
-                                                srcNode.visitedTypes.put(node.newsType, Boolean.TRUE);
-                                            }
-                                        }
+                            srcNode = nodesArray.get(edge.srcNode);
+                            // Check The Probability to see the news
+                            if (Math.random() < edge.weight) {
+                                // Check If It's not visited before
+                                if (!srcNode.visitedTypes.get(node.newsType - 1)) {
+                                    // Check The Probability to share the news
+                                    if (Math.random() < node.rate[node.newsType - 1]) {
+                                        newNodesWithNewsArray.add(srcNode);
+                                        srcNode.newsType = node.newsType;
+                                        // +1 all related counters
+                                        all++;
+                                        typeCount[node.newsType - 1]++;
+                                        NodesClassCount.put(node.nodeClass, NodesClassCount.get(node.nodeClass) + 1);
+                                    } else {
+                                        srcNode.visitedTypes.put(node.newsType, Boolean.TRUE);
                                     }
                                 }
                             }
@@ -186,8 +185,8 @@ class Edge {
     Double weight;
 
     public Edge(Integer srcIndex, Integer destIndex, Double weight) {
-        this.srcNode = srcIndex;
-        this.destNode = destIndex;
+        this.destNode = srcIndex;
+        this.srcNode = destIndex;
         this.weight = weight;
     }
 }
