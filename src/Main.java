@@ -62,6 +62,7 @@ class Graph {
             String[] splitLine = line.split("\\s+");
             Edge edge = new Edge(Integer.parseInt(splitLine[0]), Integer.parseInt(splitLine[1]), Double.parseDouble(splitLine[2]));
             edgesArray.add(edge);
+            nodesArray.get(Integer.parseInt(splitLine[0])).toEdge.add(edge);
         }
 
         // Read Input Seeds File
@@ -118,24 +119,22 @@ class Graph {
             // Find Nodes Connected to nodesWithNewsArray
             if (nodesWithNewsArray.size() != nodesArray.size())
                 for (Node node : nodesWithNewsArray) {
-                    for (Edge edge : edgesArray) {
-                        if (edge.destNode == node.nodeIndex) {
-                            srcNode = nodesArray.get(edge.srcNode);
-                            // Check The Probability to see the news
-                            if (Math.random() < edge.weight) {
-                                // Check If It's not visited before
-                                if (!srcNode.visitedTypes.get(node.newsType - 1)) {
-                                    // Check The Probability to share the news
-                                    if (Math.random() < node.rate[node.newsType - 1]) {
-                                        newNodesWithNewsArray.add(srcNode);
-                                        srcNode.newsType = node.newsType;
-                                        // +1 all related counters
-                                        all++;
-                                        typeCount[node.newsType - 1]++;
-                                        NodesClassCount.put(node.nodeClass, NodesClassCount.get(node.nodeClass) + 1);
-                                    } else {
-                                        srcNode.visitedTypes.put(node.newsType, Boolean.TRUE);
-                                    }
+                    for (Edge toEdge : node.toEdge) {
+                        srcNode = nodesArray.get(toEdge.srcNode);
+                        // Check The Probability to see the news
+                        if (Math.random() < toEdge.weight) {
+                            // Check If It's not visited before
+                            if (!srcNode.visitedTypes.get(node.newsType - 1)) {
+                                // Check The Probability to share the news
+                                if (Math.random() < node.rate[node.newsType - 1]) {
+                                    newNodesWithNewsArray.add(srcNode);
+                                    srcNode.newsType = node.newsType;
+                                    // +1 all related counters
+                                    all++;
+                                    typeCount[node.newsType - 1]++;
+                                    NodesClassCount.put(node.nodeClass, NodesClassCount.get(node.nodeClass) + 1);
+                                } else {
+                                    srcNode.visitedTypes.put(node.newsType, Boolean.TRUE);
                                 }
                             }
                         }
@@ -167,6 +166,7 @@ class Node {
     Double[] rate = new Double[3];
     Integer newsType = 0;
     HashMap<Integer, Boolean> visitedTypes = new HashMap();
+    public ArrayList<Edge> toEdge = new ArrayList();
 
     public Node(Integer nodeIndex, String nodeClass, Double[] rate) {
         this.nodeIndex = nodeIndex;
