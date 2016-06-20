@@ -1,8 +1,5 @@
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Scanner;
+import java.util.*;
 
 
 public class Main {
@@ -62,7 +59,6 @@ class Graph {
             String[] splitLine = line.split("\\s+");
             Edge edge = new Edge(Integer.parseInt(splitLine[0]), Integer.parseInt(splitLine[1]), Double.parseDouble(splitLine[2]));
             edgesArray.add(edge);
-            nodesArray.get(Integer.parseInt(splitLine[0])).toEdge.add(edge);
         }
 
         // Read Input Seeds File
@@ -115,26 +111,28 @@ class Graph {
         for (int i = 0; i < turns; i++) {
             Node srcNode;
 
-            ArrayList<Node> newNodesWithNewsArray = new ArrayList();
+            Set<Node> newNodesWithNewsArray = new HashSet<>();
             // Find Nodes Connected to nodesWithNewsArray
             if (nodesWithNewsArray.size() != nodesArray.size())
                 for (Node node : nodesWithNewsArray) {
-                    for (Edge toEdge : node.toEdge) {
-                        srcNode = nodesArray.get(toEdge.srcNode);
-                        // Check The Probability to see the news
-                        if (Math.random() < toEdge.weight) {
-                            // Check If It's not visited before
-                            if (!srcNode.visitedTypes.get(node.newsType - 1)) {
-                                // Check The Probability to share the news
-                                if (Math.random() < node.rate[node.newsType - 1]) {
-                                    newNodesWithNewsArray.add(srcNode);
-                                    srcNode.newsType = node.newsType;
-                                    // +1 all related counters
-                                    all++;
-                                    typeCount[node.newsType - 1]++;
-                                    NodesClassCount.put(node.nodeClass, NodesClassCount.get(node.nodeClass) + 1);
-                                } else {
-                                    srcNode.visitedTypes.put(node.newsType, Boolean.TRUE);
+                    for (Edge edge : edgesArray) {
+                        if (edge.destNode == node.nodeIndex) {
+                            srcNode = nodesArray.get(edge.srcNode);
+                            // Check The Probability to see the news
+                            if (Math.random() < edge.weight) {
+                                // Check If It's not visited before
+                                if (!srcNode.visitedTypes.get(node.newsType - 1)) {
+                                    // Check The Probability to share the news
+                                    if (Math.random() < node.rate[node.newsType - 1]) {
+                                        newNodesWithNewsArray.add(srcNode);
+                                        srcNode.newsType = node.newsType;
+                                        // +1 all related counters
+                                        all++;
+                                        typeCount[node.newsType - 1]++;
+                                        NodesClassCount.put(node.nodeClass, NodesClassCount.get(node.nodeClass) + 1);
+                                    } else {
+                                        srcNode.visitedTypes.put(node.newsType, Boolean.TRUE);
+                                    }
                                 }
                             }
                         }
@@ -142,6 +140,7 @@ class Graph {
                 }
 
             nodesWithNewsArray.addAll(newNodesWithNewsArray);
+            newNodesWithNewsArray.clear();
 
             // make and print line
             String nodeClassCountValues = "";
@@ -153,6 +152,7 @@ class Graph {
                 typeCountValues += " " + e;
             }
             writer.println(i + " " + all + typeCountValues + nodeClassCountValues);
+            System.out.println("in loop" + new Date() + " index:" + i + " size:" + nodesWithNewsArray.size());
         }
 
         writer.close();
@@ -166,7 +166,6 @@ class Node {
     Double[] rate = new Double[3];
     Integer newsType = 0;
     HashMap<Integer, Boolean> visitedTypes = new HashMap();
-    public ArrayList<Edge> toEdge = new ArrayList();
 
     public Node(Integer nodeIndex, String nodeClass, Double[] rate) {
         this.nodeIndex = nodeIndex;
